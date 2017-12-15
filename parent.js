@@ -3,18 +3,21 @@ console.log('Hi I am parent process!');
 const http = require('http');
 
 
-const httpserver = http.createServer ((req, res) => {
-  //req.end('hello child');
-  console.log('incoming request (get/post) connection from child process');
-
-});
+const httpserver = http.createServer ();
 httpserver.listen(8100, '127.0.0.1', () => {
   console.log('parent server is up!');
 });
 
+ httpserver.on('request', (req, res) => {
+   res.end('GET request ended');
+   console.log('incoming request (get/post) connection from child process');
+ })
+
+
 httpserver.on('connection', (socket) => {  // emitted when a new socket connection is established
   console.log('incoming socket connection from child process');
-  socket.write('connected');
+   socket.write('HTTP/1.1 200 OK');
+   socket.write('connected');
 });
 
 const child_process = spawn(process.argv[0], ['child.js'],  {
